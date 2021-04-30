@@ -5,14 +5,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import ks.client2client.protocol.ManagementClient;
-import ks.client2client.protocol.ManagementProtocol;
+import ks.client2client.protocol.Client2ClientManagementProtocol;
 
 public class ManagementClientHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
     System.out.println("Management Channel Active - channel : " + ctx.channel().id().asShortText());
     SocketClientMain.getInstance().getManagementClient().setCtx(ctx);
-    ManagementProtocol.sendManagementSocketAccess(SocketClientMain.getInstance().getManagementClient());
+    Client2ClientManagementProtocol.sendManagementSocketAccess(SocketClientMain.getInstance().getManagementClient());
   }
 
   @Override
@@ -28,7 +28,7 @@ public class ManagementClientHandler extends ChannelInboundHandlerAdapter {
   public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
     ManagementClient client = SocketClientMain.getInstance().getManagementClient();
     if (client.getDataBuffer() != null) {
-      ManagementProtocol.runReceivedMsg(client, (ArrayList<ByteBuf>)client.getDataBuffer().clone());
+      Client2ClientManagementProtocol.runReceivedMsg(client, (ArrayList<ByteBuf>)client.getDataBuffer().clone());
     }
     client.setDataBuffer(null);
   }

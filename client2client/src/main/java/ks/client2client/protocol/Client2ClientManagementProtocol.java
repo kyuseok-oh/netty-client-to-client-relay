@@ -16,17 +16,17 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ManagementProtocol extends AbstractManagementProtocol {
+public class Client2ClientManagementProtocol extends AbstractManagementProtocol {
 
   public static void runReceivedMsg(ManagementClient managementClient, List<ByteBuf> data) {
     ParsedProtocolMsg msg;
     try {
       msg = readProtocolMsg(data);
     } catch (NoMoreDataException e) {
-      System.out.println("WARN: ManagementProtocol : No more data to read..");
+      System.out.println("WARN: Client2ClientManagementProtocol : No more data to read..");
       return;
     } catch (EndOfDataException e) {
-      System.out.println("WARN: ManagementProtocol : End-Of-Data Error");
+      System.out.println("WARN: Client2ClientManagementProtocol : End-Of-Data Error");
       return;
     }
     

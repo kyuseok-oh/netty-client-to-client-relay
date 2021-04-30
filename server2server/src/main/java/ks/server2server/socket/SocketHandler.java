@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import ks.server2server.protocol.ManagementProtocol;
+import ks.server2server.protocol.Server2ServerManagementProtocol;
 
 // 실제 각 G/W별 서버 역할을 수행하는 클래스
 public class SocketHandler extends ChannelInboundHandlerAdapter {
@@ -60,7 +60,7 @@ public class SocketHandler extends ChannelInboundHandlerAdapter {
     if (SocketServerMain.getInstance().getServerManagerChannel() == null) {
       ChannelDescriptor channelDesc = SocketServerMain.getChannelDescriptorMap().get(ctx.channel());
       if (channelDesc.getByteBufList() != null) {
-        ManagementProtocol.runReceivedMsg(ctx.channel(),
+        Server2ServerManagementProtocol.runReceivedMsg(ctx.channel(),
             (ArrayList<ByteBuf>) channelDesc.getByteBufList().clone());
       }
       channelDesc.setByteBufList(null);

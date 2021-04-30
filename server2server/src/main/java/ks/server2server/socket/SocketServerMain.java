@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import ks.server2server.protocol.ManagementProtocol;
+import ks.server2server.protocol.Server2ServerManagementProtocol;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -128,7 +128,7 @@ public class SocketServerMain {
       notMappedClientCtxList.add(clientCtx);
       Channel svrManagerChannel = SocketServerMain.getInstance().getServerManagerChannel();
       if ((svrManagerChannel != null) && svrManagerChannel.isActive()) {
-        ManagementProtocol.sendNewClientConnectRequest(clientCtx.channel());
+        Server2ServerManagementProtocol.sendNewClientConnectRequest(clientCtx.channel());
       }
     }
   }

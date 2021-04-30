@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import ks.server2server.protocol.ManagementProtocol;
+import ks.server2server.protocol.Server2ServerManagementProtocol;
 
 public class ServerManagerSocketHandler extends ChannelInboundHandlerAdapter {
   
@@ -23,7 +23,7 @@ public class ServerManagerSocketHandler extends ChannelInboundHandlerAdapter {
   public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
     ChannelDescriptor channelDesc = SocketServerMain.getChannelDescriptorMap().get(ctx.channel());
     if (channelDesc.getByteBufList() != null) {
-      ManagementProtocol.runReceivedMsg(ctx.channel(),
+      Server2ServerManagementProtocol.runReceivedMsg(ctx.channel(),
           (ArrayList<ByteBuf>) channelDesc.getByteBufList().clone());
     }
     channelDesc.setByteBufList(null);

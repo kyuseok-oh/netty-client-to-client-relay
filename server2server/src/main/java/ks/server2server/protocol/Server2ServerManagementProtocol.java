@@ -18,17 +18,17 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ManagementProtocol extends AbstractManagementProtocol {
+public class Server2ServerManagementProtocol extends AbstractManagementProtocol {
 
   public static void runReceivedMsg(Channel channel, List<ByteBuf> data) {
     ParsedProtocolMsg msg;
     try {
       msg = readProtocolMsg(data);
     } catch (NoMoreDataException e) {
-      System.out.println("WARN: ManagementProtocol : No more data to read..");
+      System.out.println("WARN: Server2ServerManagementProtocol : No more data to read..");
       return;
     } catch (EndOfDataException e) {
-      System.out.println("WARN: ManagementProtocol : End-Of-Data Error");
+      System.out.println("WARN: Server2ServerManagementProtocol : End-Of-Data Error");
       return;
     }
     
