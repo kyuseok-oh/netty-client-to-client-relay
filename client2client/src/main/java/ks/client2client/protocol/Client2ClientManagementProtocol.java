@@ -12,6 +12,7 @@ import ks.relay.common.protocol.enums.FunctionCodes;
 import ks.relay.common.protocol.exception.EndOfDataException;
 import ks.relay.common.protocol.exception.NoMoreDataException;
 import ks.relay.common.protocol.vo.ParsedProtocolMsg;
+import ks.relay.common.utils.SingletonObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -45,7 +46,7 @@ public class Client2ClientManagementProtocol extends AbstractManagementProtocol 
           break;
         case newClientConnectRequest:
           System.out.println("Received : NewClientConnectRequest - from : " + managementClient.getCtx().channel().id().asShortText());
-          NewClientConnectRequest request = SocketClientMain.getObjectMapper().readValue(bodyStr, NewClientConnectRequest.class);
+          NewClientConnectRequest request = SingletonObjectMapper.getObjectMapper().readValue(bodyStr, NewClientConnectRequest.class);
           newClientConnect(request, managementClient);
           break;
         case healthCheckResponse:
@@ -86,7 +87,7 @@ public class Client2ClientManagementProtocol extends AbstractManagementProtocol 
         .generatedClientChannelId(generatedClientChannelId)
         .build(); 
     
-    String retBody = SocketClientMain.getObjectMapper().writeValueAsString(response);
+    String retBody = SingletonObjectMapper.getObjectMapper().writeValueAsString(response);
     
     sendProtocolMsg(managementClient.getCtx().channel(), FunctionCodes.newClientConnectResponse, retBody);
   }

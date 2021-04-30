@@ -11,6 +11,7 @@ import ks.relay.common.protocol.enums.FunctionCodes;
 import ks.relay.common.protocol.exception.EndOfDataException;
 import ks.relay.common.protocol.exception.NoMoreDataException;
 import ks.relay.common.protocol.vo.ParsedProtocolMsg;
+import ks.relay.common.utils.SingletonObjectMapper;
 import ks.server2server.socket.ServerManagerSocketHandler;
 import ks.server2server.socket.SocketServerMain;
 import lombok.AccessLevel;
@@ -104,7 +105,7 @@ public class Server2ServerManagementProtocol extends AbstractManagementProtocol 
         .origClientChannelId(origChannelId)
         .build(); 
     
-    String retBody = SocketServerMain.getObjectMapper().writeValueAsString(request);
+    String retBody = SingletonObjectMapper.getObjectMapper().writeValueAsString(request);
     sendProtocolMsg(svrManagerChannel, FunctionCodes.newClientConnectRequest, retBody);
   }
 

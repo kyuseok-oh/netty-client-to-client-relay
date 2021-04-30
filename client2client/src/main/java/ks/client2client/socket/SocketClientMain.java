@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -35,8 +34,6 @@ public class SocketClientMain {
   List<ChannelHandlerContext> notMappedServerCtxList = new ArrayList<>();
   
   @Getter private ManagementClient managementClient = new ManagementClient();
-  
-  private static ObjectMapper objectMapper;
   
   EventLoopGroup group;
   Class<? extends SocketChannel> channelClass;
@@ -172,12 +169,5 @@ public class SocketClientMain {
 
   public static boolean isSolaris() {
     return (os.indexOf("sunos") >= 0);
-  }
-  
-  public static ObjectMapper getObjectMapper() {
-    if (objectMapper == null) {
-      objectMapper = new ObjectMapper();
-    }
-    return objectMapper;
   }
 }

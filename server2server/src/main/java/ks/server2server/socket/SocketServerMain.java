@@ -19,7 +19,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import ks.server2server.protocol.Server2ServerManagementProtocol;
 import lombok.AccessLevel;
@@ -51,8 +50,6 @@ public class SocketServerMain {
 
   @Getter @Setter private int port;
   
-  private static ObjectMapper objectMapper;
-
   public void acceptor() {
     EventLoopGroup bossGroup;
     EventLoopGroup workerGroup;
@@ -154,10 +151,4 @@ public class SocketServerMain {
     notMappedServerCtxList.removeIf(c -> (c.equals(ctx) || c == null || !c.channel().isActive()));
   }
   
-  public static ObjectMapper getObjectMapper() {
-    if (objectMapper == null) {
-      objectMapper = new ObjectMapper();
-    }
-    return objectMapper;
-  }
 }
