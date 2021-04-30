@@ -93,7 +93,7 @@ public abstract class AbstractManagementProtocol {
     return ParsedProtocolMsg.builder().functionCode(functionCode).body(bodyStr).build();
   }
 
-  protected static boolean checkEndOfData(int index, byte[] dataBuffer) {
+  private static boolean checkEndOfData(int index, byte[] dataBuffer) {
     if ((index + 8) > dataBuffer.length) {
       return false;
     }
@@ -103,7 +103,7 @@ public abstract class AbstractManagementProtocol {
         && (dataBuffer[index + 6] == endCode[6]) && (dataBuffer[index + 7] == endCode[7]);
   }
 
-  protected static int getIdxOfFuncCode(byte[] dataBuffer) throws NoMoreDataException {
+  private static int getIdxOfFuncCode(byte[] dataBuffer) throws NoMoreDataException {
     int index = -1;
 
     int bufLengthWithoutHeader = dataBuffer.length - 7;
@@ -127,7 +127,7 @@ public abstract class AbstractManagementProtocol {
     }
   }
 
-  protected static byte[] assembleMsg(List<ByteBuf> list) {
+  private static byte[] assembleMsg(List<ByteBuf> list) {
     List<Byte> buf = new ArrayList<>();
 
     for (ByteBuf msg : list) {
