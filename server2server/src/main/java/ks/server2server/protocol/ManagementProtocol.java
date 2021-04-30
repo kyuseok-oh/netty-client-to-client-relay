@@ -1,6 +1,5 @@
 package ks.server2server.protocol;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,7 +8,9 @@ import io.netty.channel.Channel;
 import ks.relay.common.protocol.AbstractManagementProtocol;
 import ks.relay.common.protocol.dto.request.NewClientConnectRequest;
 import ks.relay.common.protocol.enums.FunctionCodes;
-import ks.relay.common.protocol.types.UnsignedInt;
+import ks.relay.common.protocol.exception.EndOfDataException;
+import ks.relay.common.protocol.exception.NoMoreDataException;
+import ks.relay.common.protocol.vo.ParsedProtocolMsg;
 import ks.server2server.socket.ServerManagerSocketHandler;
 import ks.server2server.socket.SocketServerMain;
 import lombok.AccessLevel;
@@ -20,42 +21,19 @@ import lombok.extern.slf4j.Slf4j;
 public class ManagementProtocol extends AbstractManagementProtocol {
 
   public static void runReceivedMsg(Channel channel, List<ByteBuf> data) {
-    byte[] dataBuffer = assembleMsg(data);
-
-    int index = getIdxOfFuncCode(dataBuffer); // Check Start Communication code
-
-    if (index < 0 || (index + 12 > dataBuffer.length)) {
+    ParsedProtocolMsg msg;
+    try {
+      msg = readProtocolMsg(data);
+    } catch (NoMoreDataException e) {
+      System.out.println("WARN: ManagementProtocol : No more data to read..");
+      return;
+    } catch (EndOfDataException e) {
+      System.out.println("WARN: ManagementProtocol : End-Of-Data Error");
       return;
     }
-
-    FunctionCodes functionCode = FunctionCodes.fromCode((int) UnsignedInt.parse(dataBuffer, index));
-    index += 4;
-    int channelIdLength = (int) UnsignedInt.parse(dataBuffer, index);
-    index += 4;
-    int bodyByteLength = (int) UnsignedInt.parse(dataBuffer, index);
-    index += 4;
-
-    if ((index + channelIdLength + bodyByteLength + 8) > dataBuffer.length) {
-      return;
-    }
-
-    byte[] tempChannelId = new byte[channelIdLength];
-    System.arraycopy(dataBuffer, index, tempChannelId, 0, channelIdLength);
-    index += channelIdLength;
-
-    String bodyStr = null;
-
-    if (bodyByteLength > 0) {
-      byte[] body = new byte[bodyByteLength];
-      System.arraycopy(dataBuffer, index, body, 0, bodyByteLength);
-      index += bodyByteLength;
-      bodyStr = new String(body, StandardCharsets.UTF_8);
-      log.debug("Body : {}", bodyStr);
-    }
-
-    if (!checkEndOfData(index, dataBuffer)) {
-      return;
-    }
+    
+    FunctionCodes functionCode = msg.getFunctionCode();
+    String bodyStr = msg.getBody();
 
     if ((SocketServerMain.getInstance().getServerManagerChannel() == null || !SocketServerMain.getInstance().getServerManagerChannel().isActive())
         && (!FunctionCodes.managementSocketAccessRequest.equals(functionCode))) {

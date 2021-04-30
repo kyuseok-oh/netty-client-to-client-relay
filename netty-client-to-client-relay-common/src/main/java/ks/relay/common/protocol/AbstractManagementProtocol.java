@@ -9,7 +9,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
 import ks.relay.common.protocol.enums.FunctionCodes;
+import ks.relay.common.protocol.exception.EndOfDataException;
+import ks.relay.common.protocol.exception.NoMoreDataException;
 import ks.relay.common.protocol.types.UnsignedInt;
+import ks.relay.common.protocol.vo.ParsedProtocolMsg;
 
 public abstract class AbstractManagementProtocol {
   // HEADER :
@@ -24,13 +27,13 @@ public abstract class AbstractManagementProtocol {
   // Start and End of Protocol.
   protected static final byte[] startCode = {(byte) (0x00), (byte) (0xff), (byte) (0xff),
       (byte) (0x00), (byte) (0xff), (byte) (0x00), (byte) (0x00), (byte) (0xff)};
-  protected static final byte[] endCode = {(byte) (0x00), (byte) (0x00), (byte) (0xff), (byte) (0xff),
-      (byte) (0xff), (byte) (0xff), (byte) (0x00), (byte) (0x00)};
+  protected static final byte[] endCode = {(byte) (0x00), (byte) (0x00), (byte) (0xff),
+      (byte) (0xff), (byte) (0xff), (byte) (0xff), (byte) (0x00), (byte) (0x00)};
 
   protected static void sendProtocolMsg(Channel channel, FunctionCodes function) {
     sendProtocolMsg(channel, function, null);
   }
-  
+
   protected static void sendProtocolMsg(Channel channel, FunctionCodes function, String body) {
     ByteBuf sendBuf = ByteBufAllocator.DEFAULT.heapBuffer();
 
@@ -39,7 +42,7 @@ public abstract class AbstractManagementProtocol {
 
     byte[] channelId = channel.id().asLongText().getBytes(StandardCharsets.UTF_8);
     byte[] bodyBytes = StringUtils.isEmpty(body) ? ArrayUtils.EMPTY_BYTE_ARRAY : body.getBytes();
-    
+
     sendBuf.writeInt(channelId.length); // Channel ID Length
     sendBuf.writeInt(bodyBytes.length); // Body Length
     sendBuf.writeBytes(channelId); // Channel ID
@@ -48,7 +51,48 @@ public abstract class AbstractManagementProtocol {
 
     channel.writeAndFlush(sendBuf);
   }
-  
+
+  protected static ParsedProtocolMsg readProtocolMsg(List<ByteBuf> data)
+      throws NoMoreDataException, EndOfDataException {
+    byte[] dataBuffer = assembleMsg(data);
+
+    int index = getIdxOfFuncCode(dataBuffer); // Check Start Communication code
+
+    if (index < 0 || (index + 12 > dataBuffer.length)) {
+      throw new NoMoreDataException();
+    }
+
+    FunctionCodes functionCode = FunctionCodes.fromCode((int) UnsignedInt.parse(dataBuffer, index));
+    index += 4;
+    int channelIdLength = (int) UnsignedInt.parse(dataBuffer, index);
+    index += 4;
+    int bodyByteLength = (int) UnsignedInt.parse(dataBuffer, index);
+    index += 4;
+
+    if ((index + channelIdLength + bodyByteLength + 8) > dataBuffer.length) {
+      throw new NoMoreDataException();
+    }
+
+    byte[] tempChannelId = new byte[channelIdLength];
+    System.arraycopy(dataBuffer, index, tempChannelId, 0, channelIdLength);
+    index += channelIdLength;
+
+    String bodyStr = null;
+
+    if (bodyByteLength > 0) {
+      byte[] body = new byte[bodyByteLength];
+      System.arraycopy(dataBuffer, index, body, 0, bodyByteLength);
+      index += bodyByteLength;
+      bodyStr = new String(body, StandardCharsets.UTF_8);
+    }
+
+    if (!checkEndOfData(index, dataBuffer)) {
+      throw new EndOfDataException();
+    }
+
+    return ParsedProtocolMsg.builder().functionCode(functionCode).body(bodyStr).build();
+  }
+
   protected static boolean checkEndOfData(int index, byte[] dataBuffer) {
     if ((index + 8) > dataBuffer.length) {
       return false;
@@ -58,8 +102,8 @@ public abstract class AbstractManagementProtocol {
         && (dataBuffer[index + 4] == endCode[4]) && (dataBuffer[index + 5] == endCode[5])
         && (dataBuffer[index + 6] == endCode[6]) && (dataBuffer[index + 7] == endCode[7]);
   }
-  
-  protected static int getIdxOfFuncCode(byte[] dataBuffer) {
+
+  protected static int getIdxOfFuncCode(byte[] dataBuffer) throws NoMoreDataException {
     int index = -1;
 
     int bufLengthWithoutHeader = dataBuffer.length - 7;
@@ -79,11 +123,10 @@ public abstract class AbstractManagementProtocol {
     if ((index != -1) && (index < dataBuffer.length)) {
       return index;
     } else {
-      System.out.println("WARN: ManagementProtocol : No more data to read..");
-      return -1;
+      throw new NoMoreDataException();
     }
   }
-  
+
   protected static byte[] assembleMsg(List<ByteBuf> list) {
     List<Byte> buf = new ArrayList<>();
 
@@ -103,4 +146,5 @@ public abstract class AbstractManagementProtocol {
     }
     return receivedMsg;
   }
+
 }
