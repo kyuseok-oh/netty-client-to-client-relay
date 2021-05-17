@@ -1,4 +1,4 @@
-package ks.server2server.socket;
+package ks.relay.common.protocol.vo;
 
 import java.util.ArrayList;
 import io.netty.buffer.ByteBuf;

@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import ks.relay.common.protocol.vo.ChannelDescriptor;
 import ks.server2server.protocol.Server2ServerManagementProtocol;
 
 // 실제 각 G/W별 서버 역할을 수행하는 클래스

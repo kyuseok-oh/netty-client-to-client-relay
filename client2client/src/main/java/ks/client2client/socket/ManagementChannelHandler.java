@@ -7,30 +7,30 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import ks.client2client.protocol.ManagementClient;
 import ks.client2client.protocol.Client2ClientManagementProtocol;
 
-public class ManagementClientHandler extends ChannelInboundHandlerAdapter {
+public class ManagementChannelHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
     System.out.println("Management Channel Active - channel : " + ctx.channel().id().asShortText());
-    SocketClientMain.getInstance().getManagementClient().setCtx(ctx);
+    SocketClientMain.getInstance().getManagementClient().setOpposite(ctx.channel());
     Client2ClientManagementProtocol.sendManagementSocketAccess(SocketClientMain.getInstance().getManagementClient());
   }
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-    if(SocketClientMain.getInstance().getManagementClient().getDataBuffer() == null) {
-      SocketClientMain.getInstance().getManagementClient().setDataBuffer(new ArrayList<>());
+    if(SocketClientMain.getInstance().getManagementClient().getByteBufList() == null) {
+      SocketClientMain.getInstance().getManagementClient().setByteBufList(new ArrayList<>());
     }
-    SocketClientMain.getInstance().getManagementClient().getDataBuffer().add(((ByteBuf) msg).copy());
+    SocketClientMain.getInstance().getManagementClient().getByteBufList().add(((ByteBuf) msg).copy());
     ((ByteBuf) msg).release();
   }
   
   @Override @SuppressWarnings("unchecked")
   public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
     ManagementClient client = SocketClientMain.getInstance().getManagementClient();
-    if (client.getDataBuffer() != null) {
-      Client2ClientManagementProtocol.runReceivedMsg(client, (ArrayList<ByteBuf>)client.getDataBuffer().clone());
+    if (client.getByteBufList() != null) {
+      Client2ClientManagementProtocol.runReceivedMsg(client, (ArrayList<ByteBuf>)client.getByteBufList().clone());
     }
-    client.setDataBuffer(null);
+    client.setByteBufList(null);
   }
   
   @Override

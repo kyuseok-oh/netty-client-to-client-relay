@@ -41,16 +41,16 @@ public class Client2ClientManagementProtocol extends AbstractManagementProtocol 
     try {
       switch (functionCode) {
         case managementSocketAccessResponse:
-          System.out.println("Received : ManagementSocketAccessResponse - from : " + managementClient.getCtx().channel().id().asShortText());
+          System.out.println("Received : ManagementSocketAccessResponse - from : " + managementClient.getOpposite().id().asShortText());
           managementClient.setAvailable(true);
           break;
         case newClientConnectRequest:
-          System.out.println("Received : NewClientConnectRequest - from : " + managementClient.getCtx().channel().id().asShortText());
+          System.out.println("Received : NewClientConnectRequest - from : " + managementClient.getOpposite().id().asShortText());
           NewClientConnectRequest request = SingletonObjectMapper.getObjectMapper().readValue(bodyStr, NewClientConnectRequest.class);
           newClientConnect(request, managementClient);
           break;
         case healthCheckResponse:
-          System.out.println("Received : HealthCheckResponse - from : " + managementClient.getCtx().channel().id().asShortText());
+          System.out.println("Received : HealthCheckResponse - from : " + managementClient.getOpposite().id().asShortText());
           managementClient.setAvailable(true);
           break;
         default:
@@ -62,18 +62,18 @@ public class Client2ClientManagementProtocol extends AbstractManagementProtocol 
   }
   
   public static void sendManagementSocketAccess(ManagementClient managementClient) {
-    System.out.println("Send : ManagementSocketAccessRequest - to : " +  managementClient.getCtx().channel().id().asShortText());
-    sendProtocolMsg(managementClient.getCtx().channel(), FunctionCodes.managementSocketAccessRequest);
+    System.out.println("Send : ManagementSocketAccessRequest - to : " +  managementClient.getOpposite().id().asShortText());
+    sendProtocolMsg(managementClient.getOpposite(), FunctionCodes.managementSocketAccessRequest);
   }
   
   public static void sendHealthCheckRequest(ManagementClient managementClient) {
-    System.out.println("Send : HealthCheckRequest - to : " +  managementClient.getCtx().channel().id().asShortText());
+    System.out.println("Send : HealthCheckRequest - to : " +  managementClient.getOpposite().id().asShortText());
     managementClient.setAvailable(false);
-    sendProtocolMsg(managementClient.getCtx().channel(), FunctionCodes.healthCheckRequest);
+    sendProtocolMsg(managementClient.getOpposite(), FunctionCodes.healthCheckRequest);
   }
 
   private static void newClientConnect(NewClientConnectRequest request, ManagementClient managementClient) throws JsonProcessingException {
-    System.out.println("Send : NewClientConnectResponse - to : " +  managementClient.getCtx().channel().id().asShortText());
+    System.out.println("Send : NewClientConnectResponse - to : " +  managementClient.getOpposite().id().asShortText());
     String origChannelId = request.getOrigClientChannelId();
     
     if(StringUtils.isBlank(origChannelId)) {
@@ -89,7 +89,7 @@ public class Client2ClientManagementProtocol extends AbstractManagementProtocol 
     
     String retBody = SingletonObjectMapper.getObjectMapper().writeValueAsString(response);
     
-    sendProtocolMsg(managementClient.getCtx().channel(), FunctionCodes.newClientConnectResponse, retBody);
+    sendProtocolMsg(managementClient.getOpposite(), FunctionCodes.newClientConnectResponse, retBody);
   }
 
 }

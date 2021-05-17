@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import ks.relay.common.protocol.vo.ChannelDescriptor;
 import ks.server2server.protocol.Server2ServerManagementProtocol;
 
 public class ServerManagerSocketHandler extends ChannelInboundHandlerAdapter {
