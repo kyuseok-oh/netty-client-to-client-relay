@@ -13,8 +13,13 @@ public class ClientSocketHandler extends ChannelInboundHandlerAdapter {
   }
   
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object msg) {
+  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     opposite.writeAndFlush(msg);
+  }
+  
+  @Override
+  public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+    opposite.config().setAutoRead(ctx.channel().isWritable());
   }
 
   @Override

@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
-  Channel opposite;
+  private Channel opposite;
   
   ClientHandler(Channel opposite){
     super();
@@ -20,6 +20,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     opposite.writeAndFlush(msg);
+  }
+  
+  @Override
+  public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+    opposite.config().setAutoRead(ctx.channel().isWritable());
   }
   
   @Override
