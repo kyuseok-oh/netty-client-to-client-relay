@@ -36,7 +36,7 @@ public class SocketServerMain {
   
   public static final String SOCKET_HANDLER = "SocketHandler";
   public static final String CLIENT_SOCKET_HANDLER = "ClientSocketHandler";
-  public static final String SERVER_MANAGER_SOCKET_HANDLER = "ClientSocketHandler";
+  public static final String SERVER_MANAGER_SOCKET_HANDLER = "ServerManagerSocketHandler";
   
   // Holder for singleton class.
   private static class SockServerHolder {
