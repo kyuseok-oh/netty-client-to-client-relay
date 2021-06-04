@@ -28,7 +28,7 @@ public class SocketClientMain {
   
   @Getter private ManagementClient managementClient = new ManagementClient();
   
-  private static final int IDLE_TIME_SECONDS = 10; // Idle Seconds For Health Check(HeartBeat)
+  private static final int IDLE_TIME_SECONDS = 20; // Idle Seconds For Health Check(HeartBeat)
   
   EventLoopGroup group;
   Class<? extends SocketChannel> channelClass;

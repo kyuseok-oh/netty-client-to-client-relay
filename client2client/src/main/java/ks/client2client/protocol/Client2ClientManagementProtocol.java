@@ -34,10 +34,6 @@ public class Client2ClientManagementProtocol extends AbstractManagementProtocol 
     FunctionCodes functionCode = msg.getFunctionCode();
     String bodyStr = msg.getBody();
 
-    if (!managementClient.isAvailable()
-        && (FunctionCodes.managementSocketAccessResponse.equals(functionCode) || FunctionCodes.healthCheckResponse.equals(functionCode))) {
-      return;
-    }
     try {
       switch (functionCode) {
         case managementSocketAccessResponse:
