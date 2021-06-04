@@ -12,6 +12,7 @@ import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import ks.client2client.protocol.ManagementClient;
 import ks.relay.common.utils.enums.OS;
 import lombok.AccessLevel;
@@ -26,6 +27,8 @@ public class SocketClientMain {
   @Getter @Setter private int port;
   
   @Getter private ManagementClient managementClient = new ManagementClient();
+  
+  private static final int IDLE_TIME_SECONDS = 10; // Idle Seconds For Health Check(HeartBeat)
   
   EventLoopGroup group;
   Class<? extends SocketChannel> channelClass;
@@ -85,6 +88,7 @@ public class SocketClientMain {
     @Override
     public void initChannel(SocketChannel ch) {
       ChannelPipeline p = ch.pipeline();
+      p.addLast(new IdleStateHandler(0, 0, IDLE_TIME_SECONDS));
       p.addLast(new ManagementChannelHandler());
     }
   }

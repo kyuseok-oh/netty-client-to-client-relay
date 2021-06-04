@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import ks.client2client.protocol.ManagementClient;
 import ks.client2client.protocol.Client2ClientManagementProtocol;
 
@@ -31,6 +33,25 @@ public class ManagementChannelHandler extends ChannelInboundHandlerAdapter {
       Client2ClientManagementProtocol.runReceivedMsg(client, (ArrayList<ByteBuf>)client.getByteBufList().clone());
     }
     client.setByteBufList(null);
+  }
+  
+  @Override
+  public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    if (evt instanceof IdleStateEvent) {
+      IdleStateEvent e = (IdleStateEvent) evt;
+      if(e.state().equals(IdleState.ALL_IDLE)) {
+        ManagementClient client = SocketClientMain.getInstance().getManagementClient();
+        if(client.isAvailable()) {
+          Client2ClientManagementProtocol.sendHealthCheckRequest(client);
+        } else {
+          System.out.println("HealthCheck Failed");
+          if(ctx.channel().isActive() || ctx.channel().isOpen()) {
+            System.out.println("Management Channel Close - channel : " + ctx.channel().id().asShortText());
+            ctx.close();
+          }
+        }
+      }
+    }
   }
   
   @Override
