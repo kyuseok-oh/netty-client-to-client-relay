@@ -12,6 +12,8 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import ks.relay.common.protocol.vo.ChannelDescriptor;
+import ks.relay.common.utils.EncryptUtil;
 import ks.relay.common.utils.enums.OS;
 import ks.server2server.protocol.Server2ServerManagementProtocol;
 import lombok.AccessLevel;
@@ -51,6 +54,8 @@ public class SocketServerMain {
   @Getter @Setter private Channel serverManagerChannel = null;
 
   @Getter @Setter private int port;
+  @Getter private String apiKey;
+  @Getter private EncryptUtil encryptUtil;
   
   public void acceptor() {
     EventLoopGroup bossGroup;
@@ -106,7 +111,7 @@ public class SocketServerMain {
     return channelDescriptorMap;
   }
   
-  public synchronized void mapClientCtx(ChannelHandlerContext clientCtx) throws JsonProcessingException, InterruptedException {
+  public synchronized void mapClientCtx(ChannelHandlerContext clientCtx) throws JsonProcessingException, InterruptedException, GeneralSecurityException {
     if(!notMappedServerCtxList.isEmpty()) {
       ChannelHandlerContext serverCtx = notMappedServerCtxList.remove(0);
       channelDescriptorMap.get(serverCtx.channel()).setOpposite(clientCtx.channel());
@@ -140,6 +145,17 @@ public class SocketServerMain {
   public synchronized void deleteCtxFromNotMappedCtxList(ChannelHandlerContext ctx) {
     notMappedClientCtxList.removeIf(c -> (c.equals(ctx) || c == null || !c.channel().isActive()));
     notMappedServerCtxList.removeIf(c -> (c.equals(ctx) || c == null || !c.channel().isActive()));
+  }
+
+  public void setApiKey(String apiKey) throws NoSuchAlgorithmException {
+    this.apiKey = apiKey;
+    StringBuilder sb = new StringBuilder();
+    String tmpStr = apiKey;
+    while(sb.length() < 256) {
+      tmpStr = EncryptUtil.shaEncrypt(tmpStr);
+      sb.append(EncryptUtil.shaEncrypt(tmpStr));
+    }
+    this.encryptUtil = new EncryptUtil(sb.toString());
   }
   
 }
