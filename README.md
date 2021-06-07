@@ -42,6 +42,8 @@ In addition, it can be used for remote access via RDP to a PC in a space where i
 
 ## 5. Download
 
+[Latest release](https://github.com/kyuseok-oh/netty-client-to-client-relay/releases)
+
 ***Netty Client to Client Relay*** consists of two files: `client2client.jar` and `server2server.jar`.
 
 * Please download the `client2client.jar` file to the legacy server.
