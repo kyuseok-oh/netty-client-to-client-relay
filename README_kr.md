@@ -1,5 +1,7 @@
 # Netty Client to Client Relay
 
+[![English](https://img.shields.io/badge/language-English-orange.svg)](README.md) [![Korean](https://img.shields.io/badge/language-Korean-blue.svg)](README_kr.md)
+
 ## 1. Netty Client to Client Relay는 무엇인가요?
 
 ***Netty Client to Client Relay*** 는 중개 서버를 사용하여 클라이언트와 서버간의 TCP 소켓 통신을 클라이언트와 클라이언트의 통신처럼 Outbound 트래픽을 사용하여 중개하여 연결하여주는 유틸리티 프로그램입니다.
