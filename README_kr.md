@@ -40,6 +40,8 @@
 
 ## 5. 다운로드
 
+[Latest release](https://github.com/kyuseok-oh/netty-client-to-client-relay/releases)
+
 ***Netty Client to Client Relay*** 는 `client2client.jar`, `server2server.jar` 의 두 개의 파일로 구성되어 있습니다.
 
 * `client2client.jar` 파일은 기존 서버 위치에 다운로드 받아주시기 바랍니다.
