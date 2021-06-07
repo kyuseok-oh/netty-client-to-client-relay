@@ -1,5 +1,7 @@
 # Netty Client to Client Relay
 
+[![English](https://img.shields.io/badge/language-English-orange.svg)](README.md) [![Korean](https://img.shields.io/badge/language-Korean-blue.svg)](README_kr.md)
+
 ## 1. What is Netty Client to Client Relay?
 
 ***Netty Client to Client Relay*** is a utility program that uses an relay server to connect TCP socket communication between a client and a server using outbound traffic, just like the communication between a client and a client.
