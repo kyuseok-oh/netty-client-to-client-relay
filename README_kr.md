@@ -1,35 +1,33 @@
 # Netty Client to Client Relay
 
-## 1. What is Netty Client to Client Relay?
+## 1. Netty Client to Client Relay는 무엇인가요?
 
-***Netty Client to Client Relay*** is a utility program that uses an relay server to connect TCP socket communication between a client and a server using outbound traffic, just like the communication between a client and a client.
+***Netty Client to Client Relay*** 는 중개 서버를 사용하여 클라이언트와 서버간의 TCP 소켓 통신을 클라이언트와 클라이언트의 통신처럼 Outbound 트래픽을 사용하여 중개하여 연결하여주는 유틸리티 프로그램입니다.
 
-## 2. How is it different from traditional relay tools?
+## 2. 기존 릴레이 툴과 다른 점은 무엇인가요?
 
-In the case of the existing relay tool represented by ***socat***, inbound communication from the relay server to the legacy server had to be possible. As a result, there are two major limitations:
+***socat*** 으로 대표되는 기존 릴레이 툴의 경우 중개하여주는 서버에서 중개받는 서버로의 inbound 통신이 가능해야만 하였습니다. 이에 따라 크게 다음과 같은 두 가지 제약사항이 생기게 되었습니다.
 
-1. Inbound communication from the relay server to the legacy server must be possible.
-2. The relay server must know the IP address of the legacy server.
+1. 중개 서버에서 중개받고자 하는 서버로의 inbound 통신이 가능해야 합니다.
+2. 중개 서버는 중개받고자 하는 서버의 IP 주소를 알고 있어야만 합니다.
 
-If the legacy server cannot communicate inbound due to firewalls or other restrictions on the network, the existing relay tool could not connect the client to the server. Also, even if the legacy server you want to use uses a dynamic IP address instead of a static IP address, the existing relay tool could not be applied.
+만약 중개받고자 하는 서버가 방화벽이나 네트워크상의 기타 제약 사항으로 인해 inbound 통신이 불가능할 경우, 기존 릴레이 툴로는 클라이언트를 서버로 접속 시킬 수 없었습니다. 또한 사용하고자 하는 서버가 DHCP 등으로 인해 고정 IP 주소가 아닌 유동 IP 주소를 사용하는 경우에도 마찬가지로 기존 릴레이 툴의 적용이 불가능하였습니다.
 
-***Netty Client to Client Relay*** avoids the limitations of existing relay tools by creating a new client from the legacy server and connecting to the relay server when a client connection to the legacy server occurs without changing the legacy server.
+***Netty Client to Client Relay*** 는 기존 서버의 변경 없이 서버 접속을 클라이언트화시켜 중개 서버로 접속하게 함으로써 기존 릴레이 툴이 가지고 있던 제약 사항을 피할 수 있습니다.  
 
-Through this, it is possible to reduce costs by relaying a high-performance local server using a dynamic IP address through a low-performance cloud server VM using a static IP address.
+이를 통해 유동 IP 주소를 사용하는 고성능의 로컬 서버를 저사양의 클라우드 서버 VM을 사용하여 중개함으로써 비용을 절감하거나, inbound 트래픽이 방화벽으로 제한되어있는 공간에서의 PC에 RDP 등으로 원격 접속하는 등의 활용이 가능합니다.
 
-In addition, it can be used for remote access via RDP to a PC in a space where inbound traffic is restricted by a firewall.
+## 3. 기능
 
-## 3. Features
+***Netty Client to Client Relay*** 는 다음과 같은 기능을 가지고 있습니다:
 
-***Netty Client to Client Relay*** has the following features:
-
-* The new legacy server connection is turned into a client connection and connected as a relay server.
-* When a new client connects to the relay server, new clients are also generated and connected to the legacy server and relay.
-* It does not affect the communication of the legacy server and client.
-* It can run in any OS environment that can run JVM.
-* Multiple clients can connect simultaneously with one relay server and a legacy server.
-* Available for all protocols based on TCP.
-* It uses less resources on the relay server.
+* 기존 서버를 클라이언트화 하여 중개 서버로 접속시킵니다.
+* 중개 서버에 새로운 클라이언트 접속 시 기존 서버에서도 새로운 클라이언트가 접속되어 중개됩니다.
+* 기존 서버의 통신 기능에 영향을 미치지 않습니다.
+* JVM을 구동 가능한 모든 OS 환경에서 실행 가능합니다.
+* 하나의 중개 받는 서버로 여러 클라이언트가 동시 접속이 가능합니다.
+* TCP 통신 기반의 모든 프로토콜에서 사용 가능합니다.
+* 중개 서버의 리소스를 적게 사용합니다.
 
 ## 4. 제한 사항
 
