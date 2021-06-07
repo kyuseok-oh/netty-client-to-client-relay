@@ -1,5 +1,6 @@
 package ks.client2client.socket;
 
+import java.security.NoSuchAlgorithmException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -14,6 +15,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import ks.client2client.protocol.ManagementClient;
+import ks.relay.common.utils.EncryptUtil;
 import ks.relay.common.utils.enums.OS;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,10 +27,13 @@ public class SocketClientMain {
   @Getter @Setter private int inPort;
   @Getter @Setter private String addr;
   @Getter @Setter private int port;
+  @Getter private String apiKey;
+  @Getter private EncryptUtil encryptUtil;
   
   @Getter private ManagementClient managementClient = new ManagementClient();
   
   private static final int IDLE_TIME_SECONDS = 20; // Idle Seconds For Health Check(HeartBeat)
+  public static final int MAX_HEALTH_CHECK_COUNT = 3; // Maximum number of Health Check retries
   
   EventLoopGroup group;
   Class<? extends SocketChannel> channelClass;
@@ -123,6 +128,8 @@ public class SocketClientMain {
     }
   }
   
+  
+  
   // Holder for singleton class.
   private static class SockServerHolder {
     public static final SocketClientMain instance = new SocketClientMain();
@@ -131,5 +138,16 @@ public class SocketClientMain {
   // Singleton class instance return method.
   public static SocketClientMain getInstance() {
     return SockServerHolder.instance;
+  }
+
+  public void setApiKey(String apiKey) throws NoSuchAlgorithmException {
+    this.apiKey = apiKey;
+    StringBuilder sb = new StringBuilder();
+    String tmpStr = apiKey;
+    while(sb.length() < 256) {
+      tmpStr = EncryptUtil.shaEncrypt(tmpStr);
+      sb.append(EncryptUtil.shaEncrypt(tmpStr));
+    }
+    this.encryptUtil = new EncryptUtil(sb.toString());
   }
 }

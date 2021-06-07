@@ -8,4 +8,5 @@ import lombok.Setter;
 @Getter @Setter @NoArgsConstructor
 public class ManagementClient extends ChannelDescriptor {
   private boolean isAvailable = false;
+  private int healthCheckCounter = 0;
 }

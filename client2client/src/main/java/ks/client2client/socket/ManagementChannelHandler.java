@@ -14,7 +14,7 @@ public class ManagementChannelHandler extends ChannelInboundHandlerAdapter {
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
     System.out.println("Management Channel Active - channel : " + ctx.channel().id().asShortText());
     SocketClientMain.getInstance().getManagementClient().setOpposite(ctx.channel());
-    Client2ClientManagementProtocol.sendManagementSocketAccess(SocketClientMain.getInstance().getManagementClient());
+    Client2ClientManagementProtocol.sendManagementSocketAccessRequest(SocketClientMain.getInstance().getManagementClient());
   }
 
   @Override
@@ -44,10 +44,14 @@ public class ManagementChannelHandler extends ChannelInboundHandlerAdapter {
         if(client.isAvailable()) {
           Client2ClientManagementProtocol.sendHealthCheckRequest(client);
         } else {
-          System.out.println("HealthCheck Failed");
-          if(ctx.channel().isActive() || ctx.channel().isOpen()) {
-            System.out.println("Management Channel Close - channel : " + ctx.channel().id().asShortText());
-            ctx.close();
+          System.out.println("HealthCheck Failed - HealthCheck retries : " + client.getHealthCheckCounter());
+          if(SocketClientMain.MAX_HEALTH_CHECK_COUNT >= client.getHealthCheckCounter()) {
+            Client2ClientManagementProtocol.sendHealthCheckRequest(client);
+          } else {
+            if(ctx.channel().isActive() || ctx.channel().isOpen()) {
+              System.out.println("Management Channel Close - channel : " + ctx.channel().id().asShortText());
+              ctx.close();
+            }
           }
         }
       }
