@@ -37,7 +37,6 @@
 (통신 구간 암호화의 경우 향후 적용 예정입니다.)
 * ***Netty Client to Client Relay*** 는 현재 로그 기능을 지원하지 않습니다. 추후 로그 기능 추가 예정입니다.
 * ***Netty Client to Client Relay*** 는 릴레이 서버와 기존 서버의 연결이 끊길 시 자동으로 재접속하는 기능이 없습니다. 사용 시 참조 부탁드립니다.
-* ***Netty Client to Client Relay*** 는 현재 인증 기능이 없이 단순 릴레이 서버로써만 작동하며, 향후 인증 기능 추가 예정입니다. 따라서 현재 버전은 통신 데이터 내용이 유출되어도 지장이 없는 경우에 사용하시기 바랍니다.
 
 ## 5. 다운로드
 
@@ -48,12 +47,26 @@
 
 ## 6. 사용법
 
-***Netty Client to Client Relay*** 는 JRE 1.8에서 빌드되었습니다. 따라서 사용을 위해 각각의 서버에 JRE 1.8 이상 설치가 필요합니다.
+***Netty Client to Client Relay*** 는 OpenJDK 1.8에서 빌드 및 테스트 되었습니다. 따라서 사용을 위해 각각의 서버에 JRE 1.8 이상 설치가 필요합니다.
+
+> 서버 실행 시 순서는 먼저 중개 서버의 `server2server.jar` 를 실행시킨 뒤 기존 서버의 `client2client.jar` 파일을 실행시켜야 합니다.
+
+중개 서버의 `server2server.jar` 파일의 사용법은 다음과 같습니다.
+
+```txt
+java -jar [Path of This JAR] [Server2Server Port] [(Optional) API Auth Key]
+```
+
+각 파라미터는 다음과 같습니다.
+
+* [Path of This JAR] : `server2server.jar` 파일의 경로
+* [Server2Server Port] : `server2server` 프로그램에서 사용할 포트
+* [(Optional) API Auth Key] : 기존 서버와의 API 암호화 및 인증에 필요한 키 문자열이며, 임의의 값을 입력한다. 미입력시 중개서버 실행 과정에서 랜덤으로 키 생성 후 화면에 키값을 출력한다.
 
 기존 서버의 `client2client.jar` 파일의 사용법은 다음과 같습니다.
 
 ```txt
-java -jar [Path of This JAR] [Inbound Port for Your Server App] [Server2Server Address] [Server2Server Port]
+java -jar [Path of This JAR] [Inbound Port for Your Server App] [Server2Server Address] [Server2Server Port] [API Auth Key]
 ```
 
 각 파라미터는 다음과 같습니다.
@@ -62,28 +75,39 @@ java -jar [Path of This JAR] [Inbound Port for Your Server App] [Server2Server A
 * [Inbound Port for Your Server App] : 기존 서버 프로그램이 수신 대기중인 포트
 * [Server2Server Address] : 중개서버의 주소
 * [Server2Server Port] : 중개서버의 `server2server` 프로그램에서 지정한 포트
+* [API Auth Key] : 중개서버와의 API 암호화 및 인증에 필요한 키 문자열이며, 중개서버에서 생성된 값 또는 중개서버 실행 시 입력한 임의의 값을 동일하게 입력한다.
 
-중개 서버의 `server2server.jar` 파일의 사용법은 다음과 같습니다.
+다음은 중개 서버를 통해 기존 서버 SSH 접속을 외부 클라이언트로 릴레이하는 예제입니다. 해당 예제에서는 중개 서버(10.0.0.1)의 4000번 포트로 클라이언트가 접속할 시 기존 서버의 22번 포트로 TCP 접속이 이루어지도록 구성하였습니다.
 
-```txt
-java -jar [Path of This JAR] [Server2Server Port]
-```
-
-각 파라미터는 다음과 같습니다.
-
-* [Path of This JAR] : `server2server.jar` 파일의 경로
-* [Server2Server Port] : `server2server` 프로그램에서 사용할 포트
-
-다음은 기존 서버 SSH 접속을 중개 서버로 릴레이하는 예제입니다. 해당 예제에서는 중개 서버(10.0.0.1)의 4000번 포트로 클라이언트가 접속할 시 기존 서버의 22번 포트로 TCP 접속이 이루어지도록 구성하였습니다.
-
-* 기존 서버 사용법 예제
+* 중개 서버 사용법 예제 (사용자 키 사용 시)
 
 ```sh
-java -jar ./client2client.jar 22 10.0.0.1 4000
+java -jar ./server2server.jar 4000 testApiAuthKey
 ```
 
-* 중개 서버 사용법 예제
+* 기존 서버 사용법 예제 (사용자 키 사용 시)
+
+```sh
+java -jar ./client2client.jar 22 10.0.0.1 4000 testApiAuthKey
+```
+
+다음은 위 예제와 동일하지만 사용자 키 대신 자동 생성되는 키를 사용하는 예제입니다.
+
+* 중개 서버 사용법 예제 (키 생성 사용 시)
 
 ```sh
 java -jar ./server2server.jar 4000
+```
+
+출력 :
+
+```sh
+Generated API Auth Key :
+uUFwcbknu78fzZ5uXjE_v5J_AQRd3c5F
+```
+
+* 기존 서버 사용법 예제 (생성된 키 사용 시)
+
+```sh
+java -jar ./client2client.jar 22 10.0.0.1 4000 uUFwcbknu78fzZ5uXjE_v5J_AQRd3c5F
 ```
